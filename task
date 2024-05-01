@@ -1,0 +1,40 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load CSV files into dataframes
+test_df = pd.read_csv('test.csv')
+test_label_df = pd.read_csv('test_label.csv')
+psm_test_df = pd.read_csv('psm_test.csv')
+psm_test_label_df = pd.read_csv('psm_test_label.csv')
+msl_test_df = pd.read_csv('msl_test.csv')
+msl_test_label_df = pd.read_csv('msl_test_label.csv')
+smap_test_df = pd.read_csv('smap_test.csv')
+smap_test_label_df = pd.read_csv('smap_test_label.csv')
+
+# Merge dataframes on default index 
+merged_psm = pd.merge(psm_test_df, psm_test_label_df, left_index=True, right_index=True)
+merged_msl = pd.merge(msl_test_df, msl_test_label_df, left_index=True, right_index=True)
+merged_smap = pd.merge(smap_test_df, smap_test_label_df, left_index=True, right_index=True)
+
+# Plot time series data with anomaly regions for PSM data
+plt.figure(figsize=(10, 6))
+sns.lineplot(data=merged_psm, x=merged_psm.index, y=0, hue=merged_psm.columns[-1])
+plt.title('PSM Time Series with Anomalies')
+plt.xlabel('Timestamp')
+plt.ylabel('Value')
+plt.legend(title='Anomaly')
+plt.show()
+
+# Perform EDA
+# Visualize distribution of PSM values
+plt.figure(figsize=(8, 6))
+sns.histplot(data=merged_psm, x=merged_psm.index, bins=30)
+plt.title('Distribution of PSM Values')
+plt.xlabel('Index')
+plt.ylabel('Frequency')
+plt.show()
+
+# Identify root causes and variables contributing to anomalies 
+anomaly_analysis = merged_psm.groupby([merged_psm.columns[-1]]).mean()
+print(anomaly_analysis)
